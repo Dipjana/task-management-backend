@@ -1,0 +1,80 @@
+name: project-mannager
+version: '3.8'
+
+services:
+  backend-dev:
+    container_name: project_backend_dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env.development
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app:rwo
+      - /app/node_modules
+    profiles:
+      - dev
+    command: npm run start:dev
+    depends_on:
+      - db
+      # - redis
+
+  backend-prod:
+    container_name: project_backend_prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    
+    env_file:
+      - .env.production
+    ports:
+      - '8000:3000'
+    profiles:
+      - prod
+    depends_on:
+      - db
+      # - redis
+  db:
+    image: postgres:17.5
+    container_name: project_db
+    restart: always
+    environment:
+      - POSTGRES_USER=project_db
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=project_db
+
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # redis:
+  #   image: redis:8.0.3
+  #   depends_on:
+  #     - db
+  #   container_name: project_redis
+  #   restart: always
+  #   ports:
+  #     - '6379:6379'
+  #   volumes:
+  #     - redis_data:/data
+
+  pgadmin:
+    container_name: project_pgadmin
+    image: dpage/pgadmin4:latest
+    ports:
+      - '5050:80'
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+  # redis_data:
+  pgadmin_data:
