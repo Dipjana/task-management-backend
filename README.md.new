@@ -1,0 +1,96 @@
+🔹 Product Vision: Task Management + Time Tracking
+
+An application that allows individuals and organizations to manage their tasks, projects, and timesheets in a professional, streamlined way.
+
+Think of it as:
+
+Jira-style task management → structured projects, sprints, workflows, assignments, status tracking.
+
+Notion-style notes & flexibility → documentation, personal notes, customizable task views.
+
+Timesheet tracking → employees or freelancers can log hours against tasks/projects.
+
+🔹 Core Features
+1. Task Management
+
+Create, assign, and track tasks
+
+Support for projects, boards, and lists (Kanban, Scrum, To-do, etc.)
+
+Task attributes: title, description, tags, assignee, due date, priority
+
+Custom workflows (like Jira’s status columns)
+
+2. Collaboration & Documentation
+
+Rich text editor (Notion-style) for task descriptions and project docs
+
+Commenting & discussion on tasks
+
+File & image attachments
+
+Mentions (@employee) and notifications
+
+3. Time Tracking & Timesheets
+
+Employees can log hours per task/project
+
+Automatic or manual timers
+
+Weekly & monthly timesheet views
+
+Export reports (CSV/PDF) for payroll or invoicing
+
+4. Dashboards & Analytics
+
+Project progress (burn-down charts, task completion rate)
+
+Employee productivity reports
+
+Time spent by task/project/client
+
+5. User & Role Management
+
+Teams, departments, clients
+
+Roles: Admin, Manager, Employee, Client
+
+Permissions: who can edit/view tasks or reports
+
+🔹 Advanced (Optional for v2)
+
+AI assistant → auto-generate tasks from notes/meetings
+
+Calendar integration (Google/Outlook)
+
+Slack/Teams integration for task updates
+
+Mobile app for quick updates on-the-go
+
+🔹 Tech Stack (Recommended)
+
+Since you’re already working with React + Node.js/Nest.js + MySQL/MongoDB, a good stack could be:
+
+Frontend: Next.js (React + Tailwind + ShadCN for UI)
+
+Backend: Nest.js (TypeScript, scalable APIs)
+
+Database: PostgreSQL/MySQL (for structured data)
+
+Auth: JWT / OAuth2 (Google, Microsoft login)
+
+File Storage: S3 bucket (for attachments)
+
+Deployment: Docker + Vercel (frontend) + AWS/GCP (backend)
+
+🔹 MVP (Minimum Viable Product)
+
+To start lean, focus on:
+
+Task creation & assignment
+
+Project boards (Kanban view)
+
+Timesheet logging (manual)
+
+Dashboard with task & time overview

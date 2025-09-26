@@ -1,0 +1,138 @@
+system_users (for company side)
+
+system_users (
+  id            BIGINT PK,
+  name          VARCHAR(200),
+  email         VARCHAR(200) UNIQUE,
+  password_hash VARCHAR(255),
+  role          ENUM('superadmin','support','billingadmin'),
+  status        ENUM('active','inactive') DEFAULT 'active',
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+users (for client side)
+
+users (
+  id            BIGINT PK,
+  name          VARCHAR(200),
+  email         VARCHAR(200) UNIQUE,
+  password_hash VARCHAR(255),
+  status        ENUM('active','inactive') DEFAULT 'active',
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+organizations
+
+organizations (
+  id          BIGINT PK,
+  owner_id    BIGINT FK -> users.id, -- client user who created org
+  name        VARCHAR(200),
+  type        ENUM('personal','team') DEFAULT 'personal',
+  plan        ENUM('free','pro','enterprise') DEFAULT 'free',
+  status      ENUM('active','suspended') DEFAULT 'active',
+  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+organization_members
+
+organization_members (
+  id              BIGINT PK,
+  organization_id BIGINT FK -> organizations.id,
+  user_id         BIGINT FK -> users.id,
+  role            ENUM('owner','manager','employee') DEFAULT 'employee',
+  joined_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(organization_id, user_id)
+);
+
+projects
+
+projects (
+  id              BIGINT PK,
+  organization_id BIGINT FK -> organizations.id,
+  name            VARCHAR(200),
+  description     TEXT,
+  visibility      ENUM('private','org') DEFAULT 'org',
+  status          ENUM('active','archived') DEFAULT 'active',
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+tasks
+
+tasks (
+  id            BIGINT PK,
+  project_id    BIGINT FK -> projects.id,
+  title         VARCHAR(255),
+  description   TEXT,
+  status        ENUM('todo','in_progress','done','blocked') DEFAULT 'todo',
+  priority      ENUM('low','medium','high','urgent') DEFAULT 'medium',
+  assignee_id   BIGINT FK -> users.id NULL,
+  reporter_id   BIGINT FK -> users.id,
+  due_date      DATE NULL,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+timesheets
+
+timesheets (
+  id          BIGINT PK,
+  task_id     BIGINT FK -> tasks.id,
+  user_id     BIGINT FK -> users.id,
+  hours       DECIMAL(5,2),
+  work_date   DATE,
+  notes       TEXT,
+  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+subscriptions (managed by company-side billingadmin)subscriptions (managed by company-side billingadmin)
+
+subscriptions (
+  id              BIGINT PK,
+  organization_id BIGINT FK -> organizations.id,
+  plan            ENUM('free','pro','enterprise'),
+  start_date      DATE,
+  end_date        DATE,
+  status          ENUM('active','expired','canceled') DEFAULT 'active',
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+support_tickets (handled by company-side support)
+
+support_tickets (
+  id              BIGINT PK,
+  organization_id BIGINT FK -> organizations.id,
+  user_id         BIGINT FK -> users.id, -- client user who raised it
+  assigned_to     BIGINT FK -> system_users.id, -- support staff
+  subject         VARCHAR(255),
+  description     TEXT,
+  status          ENUM('open','in_progress','resolved','closed') DEFAULT 'open',
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+Flow
+
+Company Side (system_users)
+
+superadmin → global control (sees all orgs, subscriptions, users).
+
+support → manages support_tickets.
+
+billingadmin → manages subscriptions for orgs.
+
+Client Side (users)
+
+A user signs up → system creates a personal organization and assigns them as owner.
+
+They can upgrade to a team organization.
+
+They invite other users (organization_members) with roles manager or employee.

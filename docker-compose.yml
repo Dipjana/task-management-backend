@@ -9,6 +9,9 @@ services:
       dockerfile: Dockerfile.dev
     env_file:
       - .env.development
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     ports:
       - '3000:3000'
     volumes:
